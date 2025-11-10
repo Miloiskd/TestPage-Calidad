@@ -165,4 +165,87 @@ public class ExcelUtils {
             e.printStackTrace();
         }
     }
+
+    public static void escribirLogProductos(String categoria, String subcategoria, String producto, int cantidad, String resultado, String mensaje) {
+        String rutaArchivo = "excel/ProductosLog.xlsx";
+        Workbook workbook;
+        Sheet sheet;
+
+        try {
+            // Intentar abrir el archivo existente
+            try (FileInputStream file = new FileInputStream(rutaArchivo)) {
+                workbook = new XSSFWorkbook(file);
+                sheet = workbook.getSheetAt(0);
+            } catch (IOException e) {
+                // Si no existe, crear uno nuevo
+                workbook = new XSSFWorkbook();
+                sheet = workbook.createSheet("Productos Log");
+
+                // Crear encabezados
+                Row headerRow = sheet.createRow(0);
+                headerRow.createCell(0).setCellValue("Fecha/Hora");
+                headerRow.createCell(1).setCellValue("Categoría");
+                headerRow.createCell(2).setCellValue("Subcategoría");
+                headerRow.createCell(3).setCellValue("Producto");
+                headerRow.createCell(4).setCellValue("Cantidad");
+                headerRow.createCell(5).setCellValue("Resultado");
+                headerRow.createCell(6).setCellValue("Mensaje");
+
+                // Aplicar estilos
+                CellStyle headerStyle = workbook.createCellStyle();
+                Font font = workbook.createFont();
+                font.setBold(true);
+                headerStyle.setFont(font);
+
+                for (int i = 0; i < 7; i++) {
+                    headerRow.getCell(i).setCellStyle(headerStyle);
+                }
+            }
+
+            // Agregar nueva fila con los datos
+            int lastRowNum = sheet.getLastRowNum();
+            Row newRow = sheet.createRow(lastRowNum + 1);
+
+            // Fecha y hora actual
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String timestamp = dateFormat.format(new Date());
+
+            newRow.createCell(0).setCellValue(timestamp);
+            newRow.createCell(1).setCellValue(categoria);
+            newRow.createCell(2).setCellValue(subcategoria);
+            newRow.createCell(3).setCellValue(producto);
+            newRow.createCell(4).setCellValue(cantidad);
+            newRow.createCell(5).setCellValue(resultado);
+            newRow.createCell(6).setCellValue(mensaje);
+
+            // Aplicar estilo al resultado
+            CellStyle resultStyle = workbook.createCellStyle();
+            Font resultFont = workbook.createFont();
+
+            if (resultado.equalsIgnoreCase("ÉXITO")) {
+                resultFont.setColor(IndexedColors.GREEN.getIndex());
+            } else {
+                resultFont.setColor(IndexedColors.RED.getIndex());
+            }
+
+            resultStyle.setFont(resultFont);
+            newRow.getCell(5).setCellStyle(resultStyle);
+
+            // Ajustar ancho de columnas
+            for (int i = 0; i < 7; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            // Guardar el archivo
+            try (FileOutputStream outputStream = new FileOutputStream(rutaArchivo)) {
+                workbook.write(outputStream);
+            }
+
+            workbook.close();
+
+        } catch (IOException e) {
+            System.err.println("Error al escribir en el archivo de log de productos: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
