@@ -3,14 +3,14 @@ package com.demoblaze.test;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 
 public class BaseTest {
 
     protected WebDriver driver;
 
-    @BeforeTest
+    @BeforeMethod  // Cambiar de @BeforeTest a @BeforeMethod
     public void setup(){
         //Configurar el Driver
         WebDriverManager.chromedriver().setup();
@@ -20,10 +20,10 @@ public class BaseTest {
         driver.manage().window().maximize();
     }
 
-    @AfterTest
-    public void teaDown(){
+    @AfterMethod  // Cambiar de @AfterTest a @AfterMethod
+    public void tearDown(){
         if(driver != null){
-            //driver.quit();
+            driver.quit();  // Descomentar esta línea
         }
     }
 }
