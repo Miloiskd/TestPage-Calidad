@@ -37,7 +37,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- ✅ Apache POI para leer y escribir archivos Excel -->
+        <!-- Apache POI para leer y escribir archivos Excel -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
