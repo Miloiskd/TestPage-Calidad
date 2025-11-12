@@ -18,6 +18,9 @@ import java.util.Map;
 
 public class RegisterPage extends BasePage {
 
+    private String emailUser;
+    private String nameUser;
+
     public RegisterPage(WebDriver driver) {
         super(driver);
     }
@@ -76,6 +79,9 @@ public class RegisterPage extends BasePage {
 
         driver.findElement(privacyPolicy).click();
         driver.findElement(ContinueButton).click();
+
+        this.emailUser = datos.get("email");
+        this.nameUser = datos.get("firstName") + " " + datos.get("lastName");
     }
 
     public boolean isCreatedSuccessful(){
@@ -107,4 +113,13 @@ public class RegisterPage extends BasePage {
             return false;
         }
     }
+
+    public String getEmail() {
+        return emailUser;
+    }
+
+    public String getNombre() {
+        return nameUser;
+    }
+
 }

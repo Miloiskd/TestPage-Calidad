@@ -3,6 +3,7 @@ package com.demoblaze.test;
 import com.demoblaze.pages.HomePage;
 import com.demoblaze.pages.RegisterPage;
 import com.demoblaze.utils.Constants;
+import com.demoblaze.utils.ExcelUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
@@ -29,7 +30,27 @@ public class RegisterTest extends BaseTest{
         //Crear cuenta utilizando excel
         registerPage.createAccount(1);
 
-        Assert.assertTrue(registerPage.isCreatedSuccessful(),
+        boolean resultadoRegistro = registerPage.isCreatedSuccessful();
+
+        if (resultadoRegistro) {
+            System.out.println("Registro correctamente validado");
+            ExcelUtils.escribirLogRegistro(
+                    registerPage.getEmail(),
+                    registerPage.getNombre(),
+                    "ÉXITO",
+                    "Cuenta creada correctamente."
+            );
+        } else {
+            System.out.println("❌ Falló la creación de la cuenta");
+            ExcelUtils.escribirLogRegistro(
+                    registerPage.getEmail(),
+                    registerPage.getNombre(),
+                    "ERROR",
+                    "No se encontró mensaje de confirmación."
+            );
+        }
+
+        Assert.assertTrue(resultadoRegistro,
                 "El mensaje no fue exitoso, No se encontró mensaje de confirmación");
         System.out.println("Registro correctamente validado");
 
