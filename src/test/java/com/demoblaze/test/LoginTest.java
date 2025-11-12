@@ -48,25 +48,31 @@ public class LoginTest extends BaseTest {
             loginPage.login(email, password);
 
             // Validar el resultado
-            if (expectedResult.equalsIgnoreCase("success")) {
+            if (expectedResult.equalsIgnoreCase("Exito")) {
                 // Validar login exitoso
                 Assert.assertTrue(loginPage.isLoginSuccessful(),
                         "El login debería ser exitoso para: " + email);
-                System.out.println("✓ Login exitoso verificado");
+                System.out.println("Login exitoso verificado");
 
                 // Hacer logout para el siguiente caso
-                homePage.menuAccount();
-                // Agregar aquí el logout si es necesario
+                try {
+                    homePage.menuAccount();
+                    homePage.clickLogoutOption();
+                    System.out.println("Logout realizado");
+                } catch (Exception e) {
+                    System.out.println("Logout falló, limpiando cookies...");
+                }
 
-            } else if (expectedResult.equalsIgnoreCase("failure")) {
+            } else if (expectedResult.equalsIgnoreCase("Error")) {
                 // Validar que aparezca mensaje de error
                 Assert.assertTrue(loginPage.isErrorMessageDisplayed(),
                         "Debería mostrarse mensaje de error para credenciales inválidas: " + email);
-                System.out.println("✓ Mensaje de error verificado");
+                System.out.println("Mensaje de error verificado");
                 System.out.println("Mensaje: " + loginPage.getErrorMessage());
             }
 
-            // Volver a la página principal para el siguiente intento
+            // Limpiar sesión y volver a la página principal para el siguiente intento
+            driver.manage().deleteAllCookies();
             homePage.navigateTo(Constants.BASE_URL);
         }
 
@@ -84,7 +90,7 @@ public class LoginTest extends BaseTest {
         // Navegar a la página
         homePage.navigateTo(Constants.BASE_URL);
 
-        // Leer datos del Excel
+        // Leer datos del Excel - 2 filas
         List<Map<String, String>> datosLogin = loginPage.leerDatosLogin();
 
         System.out.println("\n=== Iniciando pruebas de Login con SoftAssert ===");
@@ -99,27 +105,36 @@ public class LoginTest extends BaseTest {
             System.out.println("\n--- Caso " + (i + 1) + " ---");
             System.out.println("Email: " + email);
 
-            // Ir a la página de login
+            // Ir al login
             homePage.menuAccount();
             homePage.clickLoginOption();
 
-            // Realizar login
+            //  login
             loginPage.login(email, password);
 
             // Validar el resultado con SoftAssert
-            if (expectedResult.equalsIgnoreCase("success")) {
+            if (expectedResult.equalsIgnoreCase("Exito")) {
                 softAssert.assertTrue(loginPage.isLoginSuccessful(),
                         "El login debería ser exitoso para: " + email);
-            } else {
+
+                // Hacer logout si fue exitoso
+                try {
+                    homePage.menuAccount();
+                    homePage.clickLogoutOption();
+                } catch (Exception e) {
+                    System.out.println("No se pudo hacer logout");
+                }
+
+            } else if (expectedResult.equalsIgnoreCase("Error")) {
                 softAssert.assertTrue(loginPage.isErrorMessageDisplayed(),
                         "Debería mostrarse mensaje de error para: " + email);
             }
 
-            // Volver a la página principal
+            // Limpiar sesión y volver a la página principal
+            driver.manage().deleteAllCookies();
             homePage.navigateTo(Constants.BASE_URL);
         }
 
-        // Reportar todos los errores al final
         softAssert.assertAll();
         System.out.println("\n=== Pruebas de Login con SoftAssert finalizadas ===");
     }

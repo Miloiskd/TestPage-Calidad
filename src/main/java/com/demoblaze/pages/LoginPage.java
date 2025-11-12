@@ -25,8 +25,8 @@ public class LoginPage extends BasePage {
     }
 
     // Elementos de la página de login
-    private By emailInput = By.id("input-email");
-    private By passwordInput = By.id("input-password");
+    private By emailInput = By.xpath("//*[@id=\"input-email\"]");
+    private By passwordInput = By.xpath("//*[@id=\"input-password\"]");
     private By loginButton = By.xpath("//input[@value='Login']");
     private By successMessage = By.xpath("//h2[text()='My Account']");
     private By errorMessage = By.xpath("//div[contains(@class, 'alert-danger')]");

@@ -17,6 +17,7 @@ public class HomePage extends BasePage {
     private By myAccount = By.xpath("//li[contains(@class, 'dropdown')]//a");
     private By registerAccount = By.xpath("//ul[@class='dropdown-menu dropdown-menu-right']/li/a[text()='Register']");
     private By loginOption = By.xpath("//*[@id=\"top-links\"]/ul/li[2]/ul/li[2]/a");
+    private By logoutOption = By.xpath("//a[contains(text(), 'Logout')]");
 
     // Métodos de acción
     public void menuAccount() {
@@ -33,5 +34,10 @@ public class HomePage extends BasePage {
     public void clickLoginOption() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.elementToBeClickable(loginOption)).click();
+    }
+
+    public void clickLogoutOption() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.elementToBeClickable(logoutOption)).click();
     }
 }
