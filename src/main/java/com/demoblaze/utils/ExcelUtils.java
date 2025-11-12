@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static com.demoblaze.utils.Constants.RUTA_LOG_CARRITO;
+import static com.demoblaze.utils.Constants.RUTA_LOG_PRODUCTOS;
+
 public class ExcelUtils {
 
       //Escribe los resultados del registro en un archivo de log
@@ -85,7 +88,7 @@ public class ExcelUtils {
     }
 
     public static void escribirLogProductos(String categoria, String subcategoria, String producto, int cantidad, String resultado, String mensaje) {
-        String rutaArchivo = "excel/ProductosLog.xlsx";
+        String rutaArchivo = RUTA_LOG_PRODUCTOS;
         Workbook workbook;
         Sheet sheet;
 
@@ -171,7 +174,7 @@ public class ExcelUtils {
      * Escribe los resultados de la verificación del carrito en un archivo de log
      */
     public static void escribirLogCarrito(String categoria, String subcategoria, String producto, int cantidadEsperada, int cantidadEnCarrito, String resultado, String mensaje) {
-        String rutaArchivo = "excel/CarritoLog.xlsx";
+        String rutaArchivo = RUTA_LOG_CARRITO;
         Workbook workbook;
         Sheet sheet;
 
@@ -228,7 +231,7 @@ public class ExcelUtils {
             CellStyle resultStyle = workbook.createCellStyle();
             Font resultFont = workbook.createFont();
 
-            if (resultado.equalsIgnoreCase("EXITO")) {
+            if (resultado.equalsIgnoreCase("ÉXITO")) {
                 resultFont.setColor(IndexedColors.GREEN.getIndex());
             } else {
                 resultFont.setColor(IndexedColors.RED.getIndex());
