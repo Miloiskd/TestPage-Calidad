@@ -5,8 +5,9 @@ import com.demoblaze.pages.HomePage;
 import com.demoblaze.pages.SearchPage;
 import com.demoblaze.utils.Constants;
 import com.demoblaze.utils.ExcelUtils;
-import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
+
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ public class CartVerificationTest extends BaseTest {
 
     @Test(description = "Buscar productos, agregarlos al carrito y verificar que estén presentes")
     public void testSearchAddAndVerifyProductsInCart() {
+        SoftAssert softAssert = new SoftAssert();
         HomePage homePage = new HomePage(driver);
         CartPage cartPage = new CartPage(driver);
         SearchPage searchPage = new SearchPage(driver);
@@ -49,7 +51,7 @@ public class CartVerificationTest extends BaseTest {
 
                 // Verificar que aparece en los resultados
                 boolean productoEncontrado = searchPage.isProductInResults(nombreProducto);
-                Assert.assertTrue(productoEncontrado,
+                softAssert.assertTrue(productoEncontrado,
                         "El producto '" + nombreProducto + "' debería aparecer en los resultados");
 
                 // Hacer clic en el producto
@@ -63,7 +65,7 @@ public class CartVerificationTest extends BaseTest {
 
                 // Verificar mensaje de éxito
                 boolean mensajeExito = searchPage.isSuccessMessageDisplayed();
-                Assert.assertTrue(mensajeExito,
+                softAssert.assertTrue(mensajeExito,
                         "Debería mostrarse el mensaje de éxito al agregar '" + nombreProducto + "' al carrito");
 
                 // Escribir en el log
@@ -128,7 +130,7 @@ public class CartVerificationTest extends BaseTest {
                                 cantidadEsperada, cantidadEnCarrito, "ERROR",
                                 "La cantidad en el carrito (" + cantidadEnCarrito + ") no coincide con la esperada (" + cantidadEsperada + ")");
                         productosFallidos++;
-                        Assert.fail("La cantidad del producto '" + nombreProducto + "' en el carrito (" +
+                        softAssert.fail("La cantidad del producto '" + nombreProducto + "' en el carrito (" +
                                 cantidadEnCarrito + ") no coincide con la esperada (" + cantidadEsperada + ")");
                     }
                 } else {
@@ -137,17 +139,15 @@ public class CartVerificationTest extends BaseTest {
                             cantidadEsperada, 0, "ERROR",
                             "Producto no encontrado en el carrito");
                     productosFallidos++;
-                    Assert.fail("El producto '" + nombreProducto + "' no fue encontrado en el carrito");
+                    softAssert.fail("El producto '" + nombreProducto + "' no fue encontrado en el carrito");
                 }
 
-            } catch (AssertionError e) {
-                throw e;
             } catch (Exception e) {
                 System.err.println("✗ Error al verificar el producto: " + e.getMessage());
                 ExcelUtils.escribirLogCarrito(categoria, subcategoria, nombreProducto,
                         cantidadEsperada, 0, "ERROR", e.getMessage());
                 productosFallidos++;
-                throw e;
+                // No lanzar excepción, continuar con soft asserts
             }
         }
 
@@ -157,7 +157,8 @@ public class CartVerificationTest extends BaseTest {
         System.out.println("Productos con errores: " + productosFallidos);
         System.out.println("Total en carrito: " + cartPage.getTotalProductsInCart());
 
-        Assert.assertEquals(productosFallidos, 0, "Algunos productos no fueron verificados correctamente");
+        softAssert.assertEquals(productosFallidos, 0, "Algunos productos no fueron verificados correctamente");
         System.out.println("\n✓ Todos los productos del Excel están en el carrito con las cantidades correctas");
+        softAssert.assertAll();
     }
 }
