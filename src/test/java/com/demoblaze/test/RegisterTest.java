@@ -41,7 +41,7 @@ public class RegisterTest extends BaseTest{
                     "Cuenta creada correctamente."
             );
         } else {
-            System.out.println("❌ Falló la creación de la cuenta");
+            System.out.println("Falló la creación de la cuenta");
             ExcelUtils.escribirLogRegistro(
                     registerPage.getEmail(),
                     registerPage.getNombre(),
@@ -78,6 +78,26 @@ public class RegisterTest extends BaseTest{
         //Validar mensaje de email duplicado
         registerPage.createAccount(2);
 
+        boolean warningEmail = registerPage.isWarningEmailDisplayed();
+
+        if (warningEmail) {
+            System.out.println("Mensaje de advertencia por email duplicado validado correctamente.");
+            ExcelUtils.escribirLogRegistro(
+                    registerPage.getEmail(),
+                    registerPage.getNombre(),
+                    "ÉXITO",
+                    "Se mostró mensaje de advertencia por email duplicado."
+            );
+        } else {
+            System.out.println("No se encontró mensaje de advertencia por email duplicado.");
+            ExcelUtils.escribirLogRegistro(
+                    registerPage.getEmail(),
+                    registerPage.getNombre(),
+                    "ERROR",
+                    "No se mostró mensaje de email duplicado."
+            );
+        }
+
         Assert.assertTrue(registerPage.isWarningEmailDisplayed(),
                 "No se encontró mensaje de advertencia por email duplicado.");
         System.out.println("Mensaje de advertencia por email duplicado validado correctamente.");
@@ -102,6 +122,26 @@ public class RegisterTest extends BaseTest{
 
         // Validar mensaje de contraseña segura.
         registerPage.createAccount(3); // Fila 3 = contraseña insegura
+
+        boolean warningPassword = registerPage.isSecurePasswordDisplayed();
+
+        if (warningPassword) {
+            System.out.println("Mensaje de contraseña insegura validado correctamente.");
+            ExcelUtils.escribirLogRegistro(
+                    registerPage.getEmail(),
+                    registerPage.getNombre(),
+                    "ÉXITO",
+                    "Se mostró mensaje de advertencia por contraseña insegura."
+            );
+        } else {
+            System.out.println("No se encontró mensaje de contraseña insegura.");
+            ExcelUtils.escribirLogRegistro(
+                    registerPage.getEmail(),
+                    registerPage.getNombre(),
+                    "ERROR",
+                    "No se mostró mensaje de contraseña insegura."
+            );
+        }
 
         Assert.assertTrue(registerPage.isSecurePasswordDisplayed(),
                 "No se encontró mensaje de contraseña insegura.");
