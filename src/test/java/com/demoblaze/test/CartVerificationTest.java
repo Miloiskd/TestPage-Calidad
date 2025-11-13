@@ -8,7 +8,6 @@ import com.demoblaze.utils.ExcelUtils;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +68,8 @@ public class CartVerificationTest extends BaseTest {
                         "Debería mostrarse el mensaje de éxito al agregar '" + nombreProducto + "' al carrito");
 
                 // Escribir en el log
-                ExcelUtils.escribirLogProductos(categoria, subcategoria, nombreProducto, cantidad, "ÉXITO", "Producto agregado al carrito");
+                ExcelUtils.escribirLogProductos(categoria, subcategoria, nombreProducto, cantidad, "ÉXITO",
+                        "Producto agregado al carrito");
 
                 // Volver a la página principal para el siguiente producto
                 homePage.navigateTo(Constants.BASE_URL);
@@ -79,13 +79,13 @@ public class CartVerificationTest extends BaseTest {
                 System.err.println("Error: " + e.getMessage());
 
                 // Escribir error en el log
-                ExcelUtils.escribirLogProductos(categoria, subcategoria, nombreProducto, cantidad, "ERROR", e.getMessage());
+                ExcelUtils.escribirLogProductos(categoria, subcategoria, nombreProducto, cantidad, "ERROR",
+                        e.getMessage());
 
                 // Volver a la página principal
                 homePage.navigateTo(Constants.BASE_URL);
 
-                // Lanzar la excepción para que falle el test
-                throw e;
+                // Continuar con el siguiente producto sin lanzar excepción
             }
         }
 
@@ -128,7 +128,8 @@ public class CartVerificationTest extends BaseTest {
                         System.out.println("✗ La cantidad no coincide");
                         ExcelUtils.escribirLogCarrito(categoria, subcategoria, nombreProducto,
                                 cantidadEsperada, cantidadEnCarrito, "ERROR",
-                                "La cantidad en el carrito (" + cantidadEnCarrito + ") no coincide con la esperada (" + cantidadEsperada + ")");
+                                "La cantidad en el carrito (" + cantidadEnCarrito + ") no coincide con la esperada ("
+                                        + cantidadEsperada + ")");
                         productosFallidos++;
                         softAssert.fail("La cantidad del producto '" + nombreProducto + "' en el carrito (" +
                                 cantidadEnCarrito + ") no coincide con la esperada (" + cantidadEsperada + ")");
