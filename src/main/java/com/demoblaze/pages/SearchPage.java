@@ -26,19 +26,15 @@ public class SearchPage extends BasePage {
         super(driver);
     }
 
-    // Elementos de búsqueda
-    private By searchInput = By.name("search");
-
-    // Elementos de resultados
+    private By searchInput = By.cssSelector("input[name='search']");
     private By productName = By.cssSelector("h4 a");
     private By noResultsMessage = By.xpath("//p[contains(text(), 'There is no product')]");
 
-    // Elementos del producto
-    private By addToCartButton = By.id("button-cart");
-    private By quantityInput = By.id("input-quantity");
+    private By addToCartButton = By.cssSelector("#button-cart");
+    private By quantityInput = By.cssSelector("#input-quantity");
 
-    // Mensaje de éxito
     private By successMessage = By.cssSelector("div.alert.alert-success");
+
 
     /**
      * Lee los productos desde el archivo Excel
@@ -53,7 +49,6 @@ public class SearchPage extends BasePage {
 
             Sheet sheet = workbook.getSheetAt(0);
 
-            // Leer desde la fila 1 (la fila 0 son los encabezados)
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row fila = sheet.getRow(i);
 
@@ -84,13 +79,14 @@ public class SearchPage extends BasePage {
 
             WebElement searchField = wait.until(ExpectedConditions.elementToBeClickable(searchInput));
             searchField.clear();
-            Thread.sleep(300);
             searchField.sendKeys(productName);
-            Thread.sleep(300);
             searchField.sendKeys(Keys.ENTER);
 
-            // Esperar a que carguen los resultados
-            Thread.sleep(2000);
+            // Esperar a que se carguen los resultados o mensaje de no resultados
+            wait.until(ExpectedConditions.or(
+                    ExpectedConditions.presenceOfAllElementsLocatedBy(this.productName),
+                    ExpectedConditions.presenceOfElementLocated(noResultsMessage)
+            ));
 
         } catch (Exception e) {
             System.err.println("Error al buscar producto: " + e.getMessage());
@@ -105,14 +101,11 @@ public class SearchPage extends BasePage {
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-            // Verificar si hay mensaje de "no results"
             try {
                 if (driver.findElement(noResultsMessage).isDisplayed()) {
                     return false;
                 }
-            } catch (Exception e) {
-                // No hay mensaje de error, continuar
-            }
+            } catch (Exception ignored) {}
 
             List<WebElement> products = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(this.productName));
 
@@ -137,7 +130,7 @@ public class SearchPage extends BasePage {
      */
     public void clickOnProduct(String productName) {
         try {
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
             List<WebElement> products = wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(this.productName));
 
             for (WebElement product : products) {
@@ -147,10 +140,8 @@ public class SearchPage extends BasePage {
                 if (productText.contains(searchText) || searchText.contains(productText)) {
                     product.click();
 
-                    // Esperar a que cargue la página del producto
-                    wait.until(ExpectedConditions.presenceOfElementLocated(addToCartButton));
-                    Thread.sleep(500);
-                    break;
+                    wait.until(ExpectedConditions.visibilityOfElementLocated(addToCartButton));
+                    return;
                 }
             }
         } catch (Exception e) {
@@ -166,23 +157,16 @@ public class SearchPage extends BasePage {
         try {
             System.out.println("Estableciendo cantidad: " + quantity);
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            WebElement quantityField = wait.until(ExpectedConditions.presenceOfElementLocated(quantityInput));
+            WebElement quantityField = wait.until(ExpectedConditions.visibilityOfElementLocated(quantityInput));
 
-            // Leer el valor actual
             String currentValue = quantityField.getAttribute("value");
-            System.out.println("Cantidad actual: " + currentValue);
-
-            // Solo modificar si es diferente
             if (!currentValue.equals(String.valueOf(quantity))) {
-                // Usar JavaScript para establecer el valor de forma segura
                 org.openqa.selenium.JavascriptExecutor js = (org.openqa.selenium.JavascriptExecutor) driver;
                 js.executeScript("arguments[0].value = '" + quantity + "';", quantityField);
-
-                Thread.sleep(500);
-                System.out.println("✓ Cantidad establecida a: " + quantity);
-            } else {
-                System.out.println("✓ Cantidad ya está en: " + quantity);
             }
+
+            wait.until(ExpectedConditions.attributeToBe(quantityField, "value", String.valueOf(quantity)));
+            System.out.println("✓ Cantidad establecida correctamente");
 
         } catch (Exception e) {
             System.err.println("Error al establecer la cantidad");
@@ -198,27 +182,21 @@ public class SearchPage extends BasePage {
             System.out.println("Agregando producto al carrito...");
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-            // Asegurar que el botón está visible y clickeable
             WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(addToCartButton));
 
-            // Hacer scroll al botón
-            ((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", addButton);
-            Thread.sleep(500);
+            ((org.openqa.selenium.JavascriptExecutor) driver)
+                    .executeScript("arguments[0].scrollIntoView(true);", addButton);
 
-            // Intentar hacer clic
             try {
                 addButton.click();
             } catch (Exception e) {
-                // Si falla, intentar con JavaScript
                 System.out.println("Clic normal falló, usando JavaScript...");
-                ((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].click();", addButton);
+                ((org.openqa.selenium.JavascriptExecutor) driver)
+                        .executeScript("arguments[0].click();", addButton);
             }
 
-            // Esperar el mensaje de éxito
-            wait.until(ExpectedConditions.presenceOfElementLocated(successMessage));
-            System.out.println("✓ Producto agregado al carrito");
-
-            Thread.sleep(1000);
+            wait.until(ExpectedConditions.visibilityOfElementLocated(successMessage));
+            System.out.println("✓ Producto agregado al carrito correctamente");
 
         } catch (Exception e) {
             System.err.println("Error al agregar al carrito");
@@ -233,7 +211,7 @@ public class SearchPage extends BasePage {
     public boolean isSuccessMessageDisplayed() {
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            return wait.until(ExpectedConditions.presenceOfElementLocated(successMessage)).isDisplayed();
+            return wait.until(ExpectedConditions.visibilityOfElementLocated(successMessage)).isDisplayed();
         } catch (Exception e) {
             return false;
         }
@@ -245,7 +223,7 @@ public class SearchPage extends BasePage {
     public String getSuccessMessage() {
         try {
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-            return wait.until(ExpectedConditions.presenceOfElementLocated(successMessage)).getText();
+            return wait.until(ExpectedConditions.visibilityOfElementLocated(successMessage)).getText();
         } catch (Exception e) {
             return "";
         }
